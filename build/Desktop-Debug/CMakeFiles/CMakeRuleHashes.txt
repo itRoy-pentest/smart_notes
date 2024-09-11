@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+f0e7027914f06a36440d2fa47789f99d CMakeFiles/smart_notes_autogen
+f0e7027914f06a36440d2fa47789f99d CMakeFiles/smart_notes_autogen_timestamp_deps
+1e49dd728eb09c9080b845f75fafbb28 smart_notes_autogen/timestamp
