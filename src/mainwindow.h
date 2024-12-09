@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "folder/Folder.h"
+#include "note/Note.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +20,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_NewNote_clicked();
+
 private:
     Ui::MainWindow *ui;
+    Folder folder;
+    Note note;
 };
 #endif // MAINWINDOW_H

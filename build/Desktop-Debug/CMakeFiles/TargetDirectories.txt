@@ -1,9 +1,0 @@
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/smart_notes.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/edit_cache.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/list_install_components.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/install.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/install/local.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/install/strip.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/smart_notes_autogen_timestamp_deps.dir
-/home/roy/Documents/project/c++/smart_notes/build/Desktop-Debug/CMakeFiles/smart_notes_autogen.dir
