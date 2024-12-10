@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "folder/Folder.h"
-#include "note/Note.h"
+#include "folder/folder.h"
+#include "note/note.h"
 
 
 QT_BEGIN_NAMESPACE

@@ -2,18 +2,23 @@ cmake_minimum_required(VERSION 3.5)
 
 project(smart_notes VERSION 0.1 LANGUAGES CXX)
 
+# Включение автообработки UI, MOC и ресурсов
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# Установка стандарта C++
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_PREFIX_PATH "/path/to/qt/6.7.2/gcc_64")
+# Указываем путь к Qt6
+set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/qt6")
 
+# Ищем Qt6 или Qt5
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# Источники проекта
 set(PROJECT_SOURCES
     src/main.cpp
     src/mainwindow.cpp
@@ -22,34 +27,33 @@ set(PROJECT_SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    # Для Qt6 используем qt_add_executable
     qt_add_executable(smart_notes
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
 else()
+    # Для Qt5 используем обычное add_executable
     add_executable(smart_notes
         ${PROJECT_SOURCES}
-        src/note/Note.h src/note/Note.cpp src/note/Note.ui
-        src/folder/Folder.h src/folder/Folder.cpp src/folder/Folder.ui
+        src/note/note.h src/note/note.cpp src/note/note.ui
+        src/folder/folder.h src/folder/folder.cpp src/folder/folder.ui
+        src/note/notelistwidget.h src/note/notelistwidget.cpp src/note/notelistwidget.ui
+
     )
 endif()
 
+# Линковка с библиотеками Qt
 target_link_libraries(smart_notes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.smart_notes)
-endif()
 set_target_properties(smart_notes PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
 )
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
+# Установка
 include(GNUInstallDirs)
 install(TARGETS smart_notes
     BUNDLE DESTINATION .
@@ -57,6 +61,7 @@ install(TARGETS smart_notes
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# Финализация для Qt6
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(smart_notes)
 endif()
