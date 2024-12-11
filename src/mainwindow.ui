@@ -16,6 +16,12 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget
+{
+	background-color: rgb(36, 31, 49);
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -47,6 +53,28 @@
           <height>50</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget
+{
+	background-color: rgb(28, 113, 216);
+}
+
+QPushButton
+{
+	color:yellow;
+}</string>
+        </property>
         <property name="text">
          <string>New folder</string>
         </property>
@@ -77,6 +105,25 @@
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget
+{
+	background-color: rgb(28, 113, 216);
+}
+
+QPushButton
+{
+	color:yellow;
+}</string>
         </property>
         <property name="text">
          <string>New note</string>
@@ -115,6 +162,13 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QWidget" name="widget" native="true">
+        <property name="styleSheet">
+         <string notr="true">QWidget
+{
+background-color: rgb(46, 194, 126);
+
+}</string>
+        </property>
         <widget class="QLabel" name="label">
          <property name="geometry">
           <rect>

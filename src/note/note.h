@@ -16,7 +16,13 @@ public:
     explicit Note(QWidget *parent = nullptr);
     ~Note();
 
+private slots:
+    void onAddNoteclicked();
+    void onRemoveNoteclicked();
+
 private:
+    void makeConnection();
+
     Ui::Note *ui;
 };
 
