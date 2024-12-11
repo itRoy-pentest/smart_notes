@@ -59,7 +59,7 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="NoteListWidget" name="widget_2" native="true"/>
+     <widget class="NoteListWidget" name="noteListWidget" native="true"/>
      <widget class="QTextEdit" name="textEdit"/>
     </widget>
    </item>
@@ -69,7 +69,7 @@
   <customwidget>
    <class>NoteListWidget</class>
    <extends>QWidget</extends>
-   <header>notelistwidget.h</header>
+   <header>note/notelistwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

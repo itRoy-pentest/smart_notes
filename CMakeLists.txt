@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(smart_notes
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        ${PROJECT_UI_FILES}  # Убедитесь, что файлы .ui здесь указаны
     )
 else()
     # Для Qt5 используем обычное add_executable

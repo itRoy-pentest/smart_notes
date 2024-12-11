@@ -3,8 +3,9 @@
 
 #include <QWidget>
 
-namespace Ui {
-class NoteListWidget;
+namespace Ui
+{
+    class NoteListWidget;
 }
 
 class NoteListWidget : public QWidget
