@@ -1,10 +1,9 @@
 #include "notemanager.h"
-#include "note.h"
-#include <QTextDocument>
-#include <QSignalMapper>
+
 
 NoteManager::NoteManager(QObject *parent): QObject{parent}
 {
+
     mapChangedSignalToNotId = new QSignalMapper(this);
     connect(mapChangedSignalToNotId, &QSignalMapper::mappedInt, this, &NoteManager::onNoteContentChanged);
 
@@ -23,9 +22,10 @@ void NoteManager::createNewNote()
 {
     int id = nextNoteId();
     auto& [note, textDocument] = notes[id];
-    notes.id = id;
+
+    note.id = id;
     note.title = "New Note";
-    note.lastModified = QDateTime::currentDataTime();
+    note.lastModified = QDateTime::currentDateTime();
     textDocument = createNewTextDocument(note);
 
     emit newNoteCreated(id);
@@ -34,10 +34,9 @@ void NoteManager::createNewNote()
 void NoteManager::removeNote(int id)
 {
     notes.erase(id);
-}
 
-std::unique_ptr<QTextDocument> NoteManager::createNewTextDocument(const Note &note)
-{
+    if(notes.empty())
+        createNewNote();
 }
 
 int nextNoteId()
@@ -45,4 +44,29 @@ int nextNoteId()
     static int Id = 0;
     return ++Id;
 }
+
+void NoteManager::onNoteContentChanged(int id)
+{
+    // Реализуйте обработку изменения содержимого заметки
+}
+
+void NoteManager::readNotes()
+{
+    // Реализуйте логику чтения заметок, например, из файла
+}
+
+void NoteManager::writeNotes()
+{
+    // Реализуйте логику записи заметок
+}
+
+
+std::unique_ptr<QTextDocument> NoteManager::createNewTextDocument(const Note& note)
+{
+    // Пример создания нового текстового документа
+    std::unique_ptr<QTextDocument> doc = std::make_unique<QTextDocument>();
+    // Здесь можно добавить логику инициализации документа, например, из содержимого заметки
+    return doc;
+}
+
 

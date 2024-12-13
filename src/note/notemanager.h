@@ -1,15 +1,16 @@
 #pragma once
 
 #include <QObject>
-#include <unordered_map>
-#include <utility>
-#include <memory>
-#include <vector>
+#include "note.h"
+#include <QTextDocument>
+#include <QSignalMapper>
+#include <QString>
+#include <QDateTime>
 
 class QTextDocument;
 class QSignalMapper;
 
-struct Note;
+int nextNoteId();
 
 class NoteManager : public QObject
 {
@@ -24,11 +25,27 @@ class NoteManager : public QObject
         void renameNote(int id, const QString& newTitle);
 
         const Note& note(int id) const;
+
         QTextDocument* noteDocument(int id) const;
         std::vector<std::reference_wrapper<Note>> noteCollection();
 
+        size_t count() const;
+
     signals:
+        void newNoteCreated(int id);
+        void noteContentChanged(int id);
+
+    private:
+        QVector<QString> listNotes;
+
+        void onNoteContentChanged(int id);
+
+        void readNotes();
+        void writeNotes();
+        std::unique_ptr<QTextDocument> createNewTextDocument(const Note& note);
 
     private:
         std::unordered_map<int, std::pair<Note, std::unique_ptr<QTextDocument>>> notes;
+
+        QSignalMapper* mapChangedSignalToNotId = nullptr;
 };

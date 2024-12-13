@@ -10,6 +10,8 @@ Note::Note(QWidget *parent): QDialog(parent), ui(new Ui::Note)
     makeConnection();
 }
 
+
+
 Note::~Note()
 {
     delete ui;
