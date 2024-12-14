@@ -39,34 +39,80 @@ void NoteManager::removeNote(int id)
         createNewNote();
 }
 
-int nextNoteId()
+void NoteManager::renameNote(int id, const QString &newTitle)
 {
-    static int Id = 0;
-    return ++Id;
+    //TODO
+    Q_UNUSED(id)
+    Q_UNUSED(newTitle)
 }
+
+const Note &NoteManager::note(int id) const
+{
+    return notes.at(id).first;
+}
+
+QTextDocument *NoteManager::noteDocument(int id) const
+{
+    auto found = notes.find(id);
+    if(found != notes.end())
+    {
+        return found->second.second.get();
+    }
+    return nullptr;
+}
+
+std::vector<std::reference_wrapper<Note> > NoteManager::noteCollection()
+{
+    std::vector<std::reference_wrapper<Note>> out;
+
+    for(auto& i : notes)
+    {
+        auto& [note, textDocument] = i.second;
+        note.content = textDocument->toPlainText();
+        out.push_back(note);
+    }
+    return out;
+}
+
+size_t NoteManager::count() const
+{
+    return notes.size();
+}
+
+
+
+
 
 void NoteManager::onNoteContentChanged(int id)
 {
-    // Реализуйте обработку изменения содержимого заметки
+    notes.at(id).first.lastModified = QDateTime::currentDateTime();
+
+    emit noteContentChanged(id);
 }
 
 void NoteManager::readNotes()
 {
-    // Реализуйте логику чтения заметок, например, из файла
+    // TODO
 }
 
 void NoteManager::writeNotes()
 {
-    // Реализуйте логику записи заметок
+    // TODO
 }
 
 
 std::unique_ptr<QTextDocument> NoteManager::createNewTextDocument(const Note& note)
 {
-    // Пример создания нового текстового документа
-    std::unique_ptr<QTextDocument> doc = std::make_unique<QTextDocument>();
-    // Здесь можно добавить логику инициализации документа, например, из содержимого заметки
-    return doc;
+    auto textDocument = std::make_unique<QTextDocument>(note.content);
+    connect(textDocument.get(), &QTextDocument::contentsChange,
+            mapChangedSignalToNotId, qOverload<>(&QSignalMapper::map));
+    mapChangedSignalToNotId->setMapping(textDocument.get(), note.id);
+    return textDocument;  // не забудь вернуть объект
 }
 
 
+int nextNoteId()
+{
+    static int Id = 0;
+    return ++Id;
+}

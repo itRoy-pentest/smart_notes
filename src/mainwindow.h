@@ -5,7 +5,6 @@
 #include "folder/folder.h"
 #include "note/note.h"
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;

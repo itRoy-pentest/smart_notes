@@ -12,6 +12,7 @@ class QSignalMapper;
 
 int nextNoteId();
 
+
 class NoteManager : public QObject
 {
     Q_OBJECT
@@ -31,7 +32,7 @@ class NoteManager : public QObject
 
         size_t count() const;
 
-    signals:
+    public slots:
         void newNoteCreated(int id);
         void noteContentChanged(int id);
 
