@@ -9,8 +9,6 @@ namespace Ui
     class NoteListWidget;
 }
 
-class QListWidget;
-
 class NoteListWidget : public QWidget
 {
     Q_OBJECT
@@ -19,19 +17,19 @@ public:
     explicit NoteListWidget(QWidget *parent = nullptr);
     ~NoteListWidget();
 
-    void addNote(const Note& note);
-    void removeChangedNote();
-    void updateCurrentNote(const Note& note);
+//     void addNote(const Note& note);
+//     void removeChangedNote();
+//     void updateCurrentNote(const Note& note);
 
-    int currentNoteId();
+//     int currentNoteId();
 
-signals:
-    void selectNoteChanged(int id);
+// signals:
+//     void selectNoteChanged(int id);
 
-private:
-    void onItemSelectionChanged();
-    void moveCurrentItemToTop(const Note& note);
-    void setupNoteItem(const Note& note, QListWidgetItem* item);
+// private:
+//     void onItemSelectionChanged();
+//     void moveCurrentItemToTop(const Note& note);
+//     void setupNoteItem(const Note& note, QListWidgetItem* item);
 
 private:
     Ui::NoteListWidget *ui;

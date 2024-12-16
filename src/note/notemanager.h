@@ -1,52 +1,39 @@
 #pragma once
 
 #include <QObject>
-#include "note.h"
+#include <QList>
 #include <QTextDocument>
-#include <QSignalMapper>
-#include <QString>
-#include <QDateTime>
-
-class QTextDocument;
-class QSignalMapper;
-
-int nextNoteId();
-
+#include <memory>
+#include "note.h"
 
 class NoteManager : public QObject
 {
     Q_OBJECT
 
-    public:
-        explicit NoteManager(QObject *parent = nullptr);
-        ~NoteManager();
+public:
+    explicit NoteManager(QObject *parent = nullptr);
+    ~NoteManager();
 
-        void createNewNote();
-        void removeNote(int id);
-        void renameNote(int id, const QString& newTitle);
+    void createNewNote();
+    void removeNote(int id);
+    void renameNote(int id, const QString &newTitle);
+    const Note& note(int id) const;
+    size_t count() const;
 
-        const Note& note(int id) const;
+    QTextDocument* noteDocument(int id) const;  // Оставляем const, т.к. он не меняет состояние объекта
+    std::vector<std::reference_wrapper<Note>> noteCollection();
 
-        QTextDocument* noteDocument(int id) const;
-        std::vector<std::reference_wrapper<Note>> noteCollection();
+signals:
+    void newNoteCreated(int id);
+    void noteContentChanged(int id);
 
-        size_t count() const;
+public slots:
+    void onNoteContentChanged(int id);  // Этот слот должен быть неконстантным
 
-    public slots:
-        void newNoteCreated(int id);
-        void noteContentChanged(int id);
+private:
+    QList<std::unique_ptr<Note>> notes;
+    int nextNoteId();
 
-    private:
-        QVector<QString> listNotes;
-
-        void onNoteContentChanged(int id);
-
-        void readNotes();
-        void writeNotes();
-        std::unique_ptr<QTextDocument> createNewTextDocument(const Note& note);
-
-    private:
-        std::unordered_map<int, std::pair<Note, std::unique_ptr<QTextDocument>>> notes;
-
-        QSignalMapper* mapChangedSignalToNotId = nullptr;
+    QTextDocument* createTextDocumentForNote(const Note& note); // Убираем const
+    // Этот метод также будет неконстантным
 };

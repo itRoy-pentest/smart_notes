@@ -2,13 +2,12 @@
 
 #include <QDialog>
 #include <QDateTime>
+#include <QTextDocument> // Для работы с QTextDocument
 
-
-class NoteManager;
 
 namespace Ui
 {
-    class Note;
+class Note;
 }
 
 class Note : public QDialog
@@ -16,8 +15,7 @@ class Note : public QDialog
     Q_OBJECT
 
 public:
-    explicit Note(NoteManager& manager, QWidget *parent = nullptr);
-    Note(QWidget *parent = nullptr);
+    explicit Note(QWidget *parent = nullptr);
     ~Note();
 
     int id;                    // Идентификатор заметки
@@ -26,33 +24,28 @@ public:
     QString content;           // Содержимое заметки
 
 private slots:
-    //handle signal from ui
-    void onAddNoteclicked();
-    void onRemoveNoteclicked();
+    // // Обработчики сигналов от UI
+    // void onAddNoteclicked();
+    // void onRemoveNoteclicked();
 
-    //handle NoteManager signal
-    void onNewNoteCreated(int id);
-    void onNoteContentChanged(int id);
+    // // Обработчики сигналов от NoteManager
+    // void onNewNoteCreated(int id);
+    // void onNoteContentChanged(int id);
 
-    //handle NoteListWidget signal
-    void onSelectedNoteChanged(int id);
-    void onRemoveNote(int id);
+    // // Обработчики сигналов от NoteListWidget
+    // void onSelectedNoteChanged(int id);
+    // void onRemoveNote(int id);
 
-    // Для реализации всего написаного
-    void mainNote(int argc, char *argv[]);
+    // // Для реализации главной функции
+    // void mainNote(int argc, char *argv[]);
 
 private:
-    void addNoteToList(const Note& note);
-    void removeNote(int id);
+    // void addNoteToList(const Note& note);
+    // void removeNote(int id);
 
-    void init();
-    void makeConnection();
-
-    NoteManager* noteManager;
-
+    // void init();
+    // void makeConnection();
 
 private:
     Ui::Note *ui;
-
-
 };
