@@ -1,12 +1,10 @@
 #pragma once
 
 #include <QWidget>
-#include <QListWidget>
-#include "note.h"
 
 namespace Ui
 {
-    class NoteListWidget;
+class NoteListWidget;
 }
 
 class NoteListWidget : public QWidget
@@ -17,21 +15,12 @@ public:
     explicit NoteListWidget(QWidget *parent = nullptr);
     ~NoteListWidget();
 
-//     void addNote(const Note& note);
-//     void removeChangedNote();
-//     void updateCurrentNote(const Note& note);
+    // Set title note
+    void setTextTitle(const QString& text);
 
-//     int currentNoteId();
-
-// signals:
-//     void selectNoteChanged(int id);
-
-// private:
-//     void onItemSelectionChanged();
-//     void moveCurrentItemToTop(const Note& note);
-//     void setupNoteItem(const Note& note, QListWidgetItem* item);
+    // Set date note
+    void setTextDate(const QString& text);
 
 private:
     Ui::NoteListWidget *ui;
 };
-

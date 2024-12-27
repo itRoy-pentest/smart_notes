@@ -40,6 +40,8 @@ else()
         src/note/note.h src/note/note.cpp src/note/note.ui
         src/folder/folder.h src/folder/folder.cpp src/folder/folder.ui
         src/note/notelistwidget.h src/note/notelistwidget.cpp src/note/notelistwidget.ui
+        src/note/models/modelsNote.h src/note/models/modelsNote.cpp
+
 
     )
 endif()

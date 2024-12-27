@@ -2,12 +2,18 @@
 
 #include <QDialog>
 #include <QDateTime>
-#include <QTextDocument> // Для работы с QTextDocument
-
+#include <QTextDocument>
+#include <QList>  // Для хранения списка заметок
+#include <QString>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QDebug>
+#include "models/modelsNote.h" // Если у вас есть модель заметок
+#include "notelistwidget.h"
 
 namespace Ui
 {
-class Note;
+    class Note;
 }
 
 class Note : public QDialog
@@ -18,34 +24,14 @@ public:
     explicit Note(QWidget *parent = nullptr);
     ~Note();
 
-    int id;                    // Идентификатор заметки
-    QString title;             // Заголовок заметки
-    QDateTime lastModified;    // Время последнего изменения
-    QString content;           // Содержимое заметки
-
 private slots:
-    // // Обработчики сигналов от UI
-    // void onAddNoteclicked();
-    // void onRemoveNoteclicked();
-
-    // // Обработчики сигналов от NoteManager
-    // void onNewNoteCreated(int id);
-    // void onNoteContentChanged(int id);
-
-    // // Обработчики сигналов от NoteListWidget
-    // void onSelectedNoteChanged(int id);
-    // void onRemoveNote(int id);
-
-    // // Для реализации главной функции
-    // void mainNote(int argc, char *argv[]);
-
-private:
-    // void addNoteToList(const Note& note);
-    // void removeNote(int id);
-
-    // void init();
-    // void makeConnection();
+    void addNote();
+    void removeNote();
 
 private:
     Ui::Note *ui;
+    QList<QString> notes;  // Список для хранения текста заметок
+    NoteListWidget noteListWidget;
+    ModelNote modelNote;
+    QList<ModelNote> listModelNote;
 };

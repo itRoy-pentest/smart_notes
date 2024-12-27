@@ -5,9 +5,12 @@
 #include "folder/folder.h"
 #include "note/note.h"
 
+// Макросы QT_BEGIN_NAMESPACE и QT_END_NAMESPACE
+// Оборачивают пространство имен Qt, чтобы оно не вступало в конфликт с вашим кодом
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 QT_END_NAMESPACE
 
@@ -20,7 +23,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_NewNote_clicked();
+    void createNewNoteButton();
 
 private:
     Ui::MainWindow *ui;

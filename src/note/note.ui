@@ -10,6 +10,12 @@
     <height>595</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -20,7 +26,7 @@
 }
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -34,152 +40,146 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="PanelNotes" native="true">
+    <widget class="QWidget" name="widget" native="true">
      <property name="styleSheet">
-      <string notr="true">QWidget
-{
-	background-color: rgb(36, 31, 49);
-}</string>
+      <string notr="true">/* QWidget контейнер */
+QWidget {
+    background-color: rgb(36, 31, 49);
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+}
+
+/* QListWidget */
+QListWidget {
+    background-color: rgb(50, 45, 70);
+    border: 1px solid #5a4e70;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+QListWidget::item {
+    padding: 8px;
+    border-radius: 5px;
+}
+
+QListWidget::item:hover {
+    background-color: rgb(70, 65, 95);
+}
+
+QListWidget::item:selected {
+    background-color: rgb(75, 67, 101);
+    color: white;
+}
+
+/* QTextEdit */
+QTextEdit {
+    background-color: rgb(50, 45, 70);
+    border: 1px solid #5a4e70;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 10px;
+    color: #e0e0e0;
+}
+
+QTextEdit:focus {
+    border: 1px solid rgb(113, 102, 155);
+}
+
+/* QPushButton - Add Note */
+QPushButton#addNoteButton {
+    background-color: rgb(58, 168, 137);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+QPushButton#addNoteButton:hover {
+    background-color: rgb(50, 150, 121);
+}
+
+QPushButton#addNoteButton:pressed {
+    background-color: rgb(40, 120, 98);
+}
+
+/* QPushButton - Remove Note */
+QPushButton#removeNoteButton {
+    background-color: rgb(245, 79, 83);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+QPushButton#removeNoteButton:hover {
+    background-color: rgb(220, 70, 74);
+}
+
+QPushButton#removeNoteButton:pressed {
+    background-color: rgb(190, 60, 64);
+}
+</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
       <item>
-       <widget class="QPushButton" name="AddNote">
-        <property name="font">
-         <font>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QWidget
-{
-	background-color: rgb(246, 211, 45);
-}</string>
-        </property>
-        <property name="text">
-         <string>Add note</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../image/icons-notes-128.png</normaloff>../../image/icons-notes-128.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+        <item>
+         <widget class="QPushButton" name="addNote">
+          <property name="text">
+           <string>New note</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeNote">
+          <property name="text">
+           <string>Remove note</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="RemoveNote">
-        <property name="font">
-         <font>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Remove note</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../image/icons-trash-120.png</normaloff>../../image/icons-trash-120.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
+       <widget class="QSplitter" name="splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+        <widget class="QListWidget" name="noteListWidget"/>
+        <widget class="QTextEdit" name="noteTextEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="childrenCollapsible">
-      <bool>false</bool>
-     </property>
-     <widget class="NoteListWidget" name="noteListWidget" native="true">
-      <property name="styleSheet">
-       <string notr="true">QWidget
-{
-	background-color: rgb(46, 194, 126);
-}</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="textEdit">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>2</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QWidget
-{
-	background-color: rgb(129, 61, 156);
-}</string>
-      </property>
-     </widget>
-    </widget>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>NoteListWidget</class>
-   <extends>QWidget</extends>
-   <header>note/notelistwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
