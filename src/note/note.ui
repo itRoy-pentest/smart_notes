@@ -127,7 +127,7 @@ QPushButton#removeNoteButton:pressed {
 }
 </string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
         <item>
@@ -165,13 +165,22 @@ QPushButton#removeNoteButton:pressed {
          <enum>Qt::Horizontal</enum>
         </property>
         <widget class="QListWidget" name="noteListWidget"/>
-        <widget class="QTextEdit" name="noteTextEdit">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <widget class="QWidget" name="">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QTextEdit" name="noteTitle">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextEdit" name="noteTextEdit"/>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

@@ -21,7 +21,7 @@ Note::~Note()
 
 void Note::addNote()
 {
-    QString noteText = ui->noteTextEdit->toPlainText();
+    QString noteText = ui->noteTitle->toPlainText();
 
     if (noteText.isEmpty())
     {
@@ -54,7 +54,7 @@ void Note::addNote()
     ui->noteListWidget->addItem(noteItem);
 
     // Очищаем поле ввода после добавления заметки
-    ui->noteTextEdit->clear();
+    ui->noteTitle->clear();
 }
 
 void Note::removeNote()
