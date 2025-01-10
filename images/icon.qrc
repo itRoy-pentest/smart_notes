@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>addFolder.png</file>
+        <file>icons-trash-120.png</file>
+        <file>addNote.png</file>
+    </qresource>
+</RCC>

@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Указываем путь к Qt6
 set(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/qt6")
 
+
 # Ищем Qt6 или Qt5
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -41,6 +42,7 @@ else()
         src/folder/folder.h src/folder/folder.cpp src/folder/folder.ui
         src/note/notelistwidget.h src/note/notelistwidget.cpp src/note/notelistwidget.ui
         src/note/models/modelsNote.h src/note/models/modelsNote.cpp
+        images/icon.qrc
 
 
     )

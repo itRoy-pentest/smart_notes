@@ -23,7 +23,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void createNewNoteButton();
+    void createNewNote();
+
+    void on_tabWidget_tabCloseRequested(int index);
 
 private:
     Ui::MainWindow *ui;
