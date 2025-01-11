@@ -8,8 +8,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QDebug>
-#include "models/modelsNote.h" // Если у вас есть модель заметок
-#include "notelistwidget.h"
+#include <QTextEdit>
 
 namespace Ui
 {
@@ -22,16 +21,18 @@ class Note : public QDialog
 
 public:
     explicit Note(QWidget *parent = nullptr);
+    explicit Note(Ui::Note *ui) : ui(ui) {}
     ~Note();
 
+    QTextEdit* getTitleEdit();
+    QTextEdit* getTextEdit();
+    QWidget* getNoteWidget();
+
+    QString setTitle(const QString &title);
+    QString setText(const QString &text);
+
 private slots:
-    void addNote();
-    void removeNote();
 
 private:
     Ui::Note *ui;
-    QList<QString> notes;  // Список для хранения текста заметок
-    NoteListWidget noteListWidget;
-    ModelNote modelNote;
-    QList<ModelNote> listModelNote;
 };

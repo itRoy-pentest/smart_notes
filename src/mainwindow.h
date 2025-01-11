@@ -25,11 +25,21 @@ public:
 private slots:
     void createNewNote();
 
-    void on_tabWidget_tabCloseRequested(int index);
+    void tabWidgetClosed();
+
+    void autoNoteSave();
+
+signals:
+    void titleChanged();
+    void textChanged();
 
 private:
     Ui::MainWindow *ui;
     Folder folder;
     Note note;
+    int noteIndex = 0; // Current note index
+
+    QTextEdit* titleEdit;
+    QTextEdit* textEdit;
 };
 #endif // MAINWINDOW_H

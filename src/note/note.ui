@@ -28,14 +28,32 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayoutText" stretch="0,1">
-     <item>
-      <widget class="QTextEdit" name="titleText"/>
-     </item>
-     <item>
-      <widget class="QTextEdit" name="mainText"/>
-     </item>
-    </layout>
+    <widget class="QWidget" name="noteWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QTextEdit" name="titleText">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(61, 56, 70);</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="textEdit"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

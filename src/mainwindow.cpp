@@ -7,16 +7,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    titleEdit = new QTextEdit(this);
+    textEdit = new QTextEdit(this);
+
     // Подключаем сигнал к слоту создания новой кнопки (createNewNoteButton)
     connect(ui->addNote, SIGNAL(clicked()), this, SLOT(createNewNote()));
-
-    // QIcon noteIcon(":/icon/addNote.png");
-    // ui->addNote->setIcon(noteIcon);
-    // ui->addNote->setIconSize(QSize(32, 32));
-
-    // QIcon folderIcon(":/icon/addFolder.png");
-    // ui->addFolder->setIcon(folderIcon);
-    // ui->addFolder->setIconSize(QSize(32, 32));
+    connect(titleEdit, &QTextEdit::textChanged, this, &MainWindow::autoNoteSave);
+    connect(textEdit, &QTextEdit::textChanged, this, &MainWindow::autoNoteSave);
 }
 
 MainWindow::~MainWindow()
@@ -27,12 +24,35 @@ MainWindow::~MainWindow()
 void MainWindow::createNewNote()
 {
     QListWidgetItem *item = new QListWidgetItem("Untitled");
+
+    // Добавляем её в список заметок
     ui->listWidget->addItem(item);
+
+    QWidget* noteWidget = note.getNoteWidget();
+
+    // Добавляем новую вкладку
+    noteIndex = ui->tabWidget->addTab(noteWidget, "Untitled");
+
+    ui->tabWidget->setCurrentIndex(noteIndex);
+
+    // Устанавливаем фокус на заголовок
+    note.getTitleEdit()->setFocus();
 }
 
-
-void MainWindow::on_tabWidget_tabCloseRequested(int index)
+void MainWindow::autoNoteSave()
 {
-    ui->tabWidget->removeTab(index);
+    titleEdit->toPlainText();
+    textEdit->toPlainText();
+
+    ui->tabWidget->widget(noteIndex);
 }
+
+void MainWindow::tabWidgetClosed()
+{
+    ui->tabWidget->removeTab(noteIndex);
+}
+
+
+
+
 
