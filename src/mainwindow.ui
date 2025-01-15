@@ -20,16 +20,37 @@
    <string notr="true">QWidget
 {
 	background-color: rgb(36, 31, 49);
+	color: white;                        /* Цвет текста */
+}
+
+QTextEdit {
+    background-color: rgb(35, 35, 45);  /* Цвет фона для QTextEdit */
+    color: white;                        /* Цвет текста в QTextEdit */ */
+}
+
+QPushButton {
+    background-color: rgb(45, 40, 60);  /* Цвет фона для кнопок */
+    color: white;                        /* Цвет текста для кнопок */
+  
+}
+
+QListWidget {
+    background-color: rgb(30, 30, 40);  /* Цвет фона для списка */
+    color: white;                        /* Цвет текста для списка */
+
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -88,6 +109,12 @@ border: 2px solid rgb(45, 40, 60); /* Цвет рамки */
 
 padding: 10px; /* Отступы */
 
+}
+
+QTextEdit {
+    background-color: rgb(35, 35, 45);  /* Цвет фона для QTextEdit */
+    color: white;                        /* Цвет текста в QTextEdit */
+    border: 1px solid rgb(45, 40, 60);   /* Цвет рамки для QTextEdit */
 }</string>
           </property>
          </widget>

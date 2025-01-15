@@ -15,6 +15,10 @@ public:
     explicit Folder(QWidget *parent = nullptr);
     ~Folder();
 
+
+
+    void createAndCheckMainFolder();
+
 private:
     Ui::Folder *ui;
 };

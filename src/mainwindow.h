@@ -1,9 +1,9 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include "folder/folder.h"
 #include "note/note.h"
+#include <QFile>
 
 // Макросы QT_BEGIN_NAMESPACE и QT_END_NAMESPACE
 // Оборачивают пространство имен Qt, чтобы оно не вступало в конфликт с вашим кодом
@@ -24,10 +24,9 @@ public:
 
 private slots:
     void createNewNote();
+    void createNewDir();
 
-    void tabWidgetClosed();
-
-    void autoNoteSave();
+    void on_tabWidget_tabCloseRequested(int index);
 
 signals:
     void titleChanged();
@@ -37,9 +36,8 @@ private:
     Ui::MainWindow *ui;
     Folder folder;
     Note note;
-    int noteIndex = 0; // Current note index
+    int currentNoteIndex = -1; // Current note index
 
-    QTextEdit* titleEdit;
-    QTextEdit* textEdit;
+    QTextEdit* titleText;
+    QTextEdit* textMain;
 };
-#endif // MAINWINDOW_H

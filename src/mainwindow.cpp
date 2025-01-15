@@ -1,19 +1,21 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QIcon>
+#include <QDir>
+#include <QInputDialog>
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), folder(), note()
 {
     ui->setupUi(this);
 
-    titleEdit = new QTextEdit(this);
-    textEdit = new QTextEdit(this);
+    titleText = new QTextEdit(this);
+    textMain = new QTextEdit(this);
 
     // Подключаем сигнал к слоту создания новой кнопки (createNewNoteButton)
     connect(ui->addNote, SIGNAL(clicked()), this, SLOT(createNewNote()));
-    connect(titleEdit, &QTextEdit::textChanged, this, &MainWindow::autoNoteSave);
-    connect(textEdit, &QTextEdit::textChanged, this, &MainWindow::autoNoteSave);
+    connect(ui->addFolder, SIGNAL(clicked()), this, SLOT(createNewDir()));
+
 }
 
 MainWindow::~MainWindow()
@@ -31,28 +33,46 @@ void MainWindow::createNewNote()
     QWidget* noteWidget = note.getNoteWidget();
 
     // Добавляем новую вкладку
-    noteIndex = ui->tabWidget->addTab(noteWidget, "Untitled");
+    currentNoteIndex = ui->tabWidget->addTab(noteWidget, "Untitled");
 
-    ui->tabWidget->setCurrentIndex(noteIndex);
+    ui->tabWidget->setCurrentIndex(currentNoteIndex);
 
     // Устанавливаем фокус на заголовок
     note.getTitleEdit()->setFocus();
 }
 
-void MainWindow::autoNoteSave()
+void MainWindow::on_tabWidget_tabCloseRequested(int index)
 {
-    titleEdit->toPlainText();
-    textEdit->toPlainText();
+    ui->tabWidget->removeTab(index);
 
-    ui->tabWidget->widget(noteIndex);
-}
-
-void MainWindow::tabWidgetClosed()
-{
-    ui->tabWidget->removeTab(noteIndex);
+    currentNoteIndex = index;
 }
 
 
+void MainWindow::createNewDir()
+{
+    QString dirName = QInputDialog::getText(this, "Create new folder", "Enter the name folder");
 
+    QDir dir("autosave");  // Создаем объект для работы с папкой autosave
+    if (dir.exists(dirName))
+    {
+        // Если папка с таким именем уже существует
+        QMessageBox::warning(this, "Error", "A folder with that name already exists!");
 
+        return;  // Завершаем выполнение метода
+    }
+
+    if (dir.mkpath(dirName))
+    {
+        // Если папка была успешно создана
+        QMessageBox::information(this, "Success", "Folder successfully created!");
+    }
+    else
+    {
+        // Если возникла ошибка при создании
+        QMessageBox::critical(this, "Error", "Cannot create folder");
+    }
+
+    ui->listWidget->addItem(dirName);  // Добавляем название папки в список
+}
 

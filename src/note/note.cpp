@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDateTime>
+#include <QFile>
+#include <QTextStream>
 
 Note::Note(QWidget *parent) : QDialog(parent), ui(new Ui::Note)
 {
@@ -13,6 +15,19 @@ Note::Note(QWidget *parent) : QDialog(parent), ui(new Ui::Note)
 Note::~Note()
 {
     delete ui;
+}
+
+void Note::autoNoteSave()
+{
+
+
+    QString titleEdit = titleText->toPlainText();
+    QString textEdit = textMain->toPlainText();
+
+    setTitle(titleEdit);
+    setText(textEdit);
+
+
 }
 
 QTextEdit *Note::getTitleEdit()
@@ -30,12 +45,17 @@ QWidget *Note::getNoteWidget()
     return ui->noteWidget;
 }
 
-QString Note::setText(const QString &title)
+void Note::setText(const QString &title)
 {
-
+    setTextMain = title;
 }
 
-QString Note::setTitle(const QString &text)
+void Note::setTitle(const QString &text)
+{
+    setTitleText = text;
+}
+
+void Note::saveToFile()
 {
 
 }
