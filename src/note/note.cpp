@@ -6,10 +6,24 @@
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
+#include <QFileDialog>
+
 
 Note::Note(QWidget *parent) : QDialog(parent), ui(new Ui::Note)
 {
     ui->setupUi(this);
+
+    autoSaveTimer = new QTimer(this);
+    autoSaveTimer->setInterval(1000);  // Интервал в миллисекундах (1 ms)
+
+    // Подключаем таймер к слоту для автоматического сохранения
+    connect(autoSaveTimer, &QTimer::timeout, this, &Note::autoNoteSave);
+
+    // Запускаем таймер
+    autoSaveTimer->start();
+
+    disconnect(autoSaveTimer, &QTimer::timeout, this, &Note::autoNoteSave);
+    autoSaveTimer->stop();
 }
 
 Note::~Note()
@@ -19,16 +33,24 @@ Note::~Note()
 
 void Note::autoNoteSave()
 {
-
-
     QString titleEdit = titleText->toPlainText();
     QString textEdit = textMain->toPlainText();
 
     setTitle(titleEdit);
     setText(textEdit);
 
+    QString path = "autosave/";
+    QString fileName = path + titleEdit + ".md";
 
+    QFile file(fileName);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream out(&file);
+        out << textEdit;
+    }
 }
+
 
 QTextEdit *Note::getTitleEdit()
 {

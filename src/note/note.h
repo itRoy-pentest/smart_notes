@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QTextEdit>
 #include <folder/folder.h>
+#include <QTimer>
 
 namespace Ui
 {
@@ -26,8 +27,6 @@ public:
     explicit Note(QWidget *parent = nullptr);
     explicit Note(Ui::Note *ui) : ui(ui) {}
     ~Note();
-
-    void autoNoteSave();
 
     /// Setters ///
 
@@ -51,6 +50,7 @@ public:
     void saveToFile();
 
 private slots:
+    void autoNoteSave();
 
 private:
     Ui::Note *ui;
@@ -63,4 +63,6 @@ private:
     QTextEdit* textMain;
 
     int currentNoteIndex = -1; // Current note index
+
+    QTimer* autoSaveTimer;
 };

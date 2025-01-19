@@ -22,15 +22,21 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void updateNoteTabTitle();
+    void updateNoteTitle();
+
 private slots:
     void createNewNote();
     void createNewDir();
 
     void on_tabWidget_tabCloseRequested(int index);
 
+
+
+    void updateText();
+
 signals:
-    void titleChanged();
-    void textChanged();
+
 
 private:
     Ui::MainWindow *ui;

@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Подключаем сигнал к слоту создания новой кнопки (createNewNoteButton)
     connect(ui->addNote, SIGNAL(clicked()), this, SLOT(createNewNote()));
     connect(ui->addFolder, SIGNAL(clicked()), this, SLOT(createNewDir()));
-
 }
 
 MainWindow::~MainWindow()
@@ -23,18 +22,45 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::updateNoteTabTitle()
+{
+    QString title = titleText->toPlainText(); // Получаем новый заголовок из QTextEdit
+    ui->tabWidget->setTabText(currentNoteIndex, title);  // Обновляем заголовок вкладки
+
+    // Также обновляем название в QListWidget
+    QListWidgetItem *item = ui->listWidget->item(currentNoteIndex);  // Получаем элемент из списка
+    if (item)
+    {
+        item->setText(title);  // Обновляем текст элемента в списке
+    }
+}
+
+void MainWindow::updateNoteTitle()
+{
+    QString title = titleText->toPlainText();  // Получаем текст из QTextEdit
+    ui->tabWidget->setTabText(currentNoteIndex, title);  // Обновляем текст вкладки
+}
+
+void MainWindow::updateText()
+{
+
+}
+
 void MainWindow::createNewNote()
 {
     QListWidgetItem *item = new QListWidgetItem("Untitled");
 
-    // Добавляем её в список заметок
+    // Add the current note to the list widget
     ui->listWidget->addItem(item);
+
+    // Get current note index
 
     QWidget* noteWidget = note.getNoteWidget();
 
-    // Добавляем новую вкладку
+    // Add new tab
     currentNoteIndex = ui->tabWidget->addTab(noteWidget, "Untitled");
 
+    // Open the note tab
     ui->tabWidget->setCurrentIndex(currentNoteIndex);
 
     // Устанавливаем фокус на заголовок
@@ -47,7 +73,6 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 
     currentNoteIndex = index;
 }
-
 
 void MainWindow::createNewDir()
 {
