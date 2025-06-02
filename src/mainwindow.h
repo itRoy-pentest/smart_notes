@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QMap>       // Для хранения открытых заметок по их пути
 #include <QListWidgetItem> // Для работы с элементами списка
+#include <QKeyEvent>    // Для обработки событий нажатия клавиш
 
 // Макросы QT_BEGIN_NAMESPACE и QT_END_NAMESPACE
 // Оборачивают пространство имен Qt, чтобы оно не вступало в конфликт с вашим кодом
@@ -27,6 +28,9 @@ public:
     void updateNoteTabTitle();
     void updateNoteTitle();
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override; // НОВОЕ: Переопределение для обработки клавиш
+
 private slots:
     void createNewNote();
     void createNewDir();
@@ -35,6 +39,11 @@ private slots:
     void handleNoteRenamed(const QString &oldPath, const QString &newPath); // Слот для обработки переименования заметки
     void handleNoteClosed(const QString &filePath); // Слот для обработки закрытия заметки
     void on_tabWidget_currentChanged(int index); // Новый слот для обработки смены активной вкладки
+    void deleteSelectedItems(); // Этот слот теперь будет вызываться из keyPressEvent
+
+    void showContextMenu(const QPoint &pos); // НОВОЕ: Слот для отображения контекстного меню
+    void renameSelectedItem();               // НОВОЕ: Слот для переименования из контекстного меню
+    void deleteItemFromContextMenu();        // НОВОЕ: Слот для удаления из контекстного меню
 
 signals:
 
