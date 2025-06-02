@@ -149,16 +149,6 @@ color: white; /* Цвет текста */
        <property name="tabBarAutoHide">
         <bool>false</bool>
        </property>
-       <widget class="QWidget" name="tab_1">
-        <attribute name="title">
-         <string>Tab 1</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>Tab 2</string>
-        </attribute>
-       </widget>
       </widget>
       <widget class="QListWidget" name="rightListWidget">
        <property name="sizePolicy">

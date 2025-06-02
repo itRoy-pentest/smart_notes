@@ -4,6 +4,8 @@
 #include "folder/folder.h"
 #include "note/note.h"
 #include <QFile>
+#include <QMap>       // Для хранения открытых заметок по их пути
+#include <QListWidgetItem> // Для работы с элементами списка
 
 // Макросы QT_BEGIN_NAMESPACE и QT_END_NAMESPACE
 // Оборачивают пространство имен Qt, чтобы оно не вступало в конфликт с вашим кодом
@@ -28,22 +30,24 @@ public:
 private slots:
     void createNewNote();
     void createNewDir();
-
     void on_tabWidget_tabCloseRequested(int index);
-
-
-
-    void updateText();
+    void onListItemClicked(QListWidgetItem *item); // Слот для клика по элементу в listWidget
+    void handleNoteRenamed(const QString &oldPath, const QString &newPath); // Слот для обработки переименования заметки
+    void handleNoteClosed(const QString &filePath); // Слот для обработки закрытия заметки
+    void on_tabWidget_currentChanged(int index); // Новый слот для обработки смены активной вкладки
 
 signals:
 
 
 private:
     Ui::MainWindow *ui;
-    Folder folder;
-    Note note;
-    int currentNoteIndex = -1; // Current note index
+    // Удаляем Folder folder; Note note; так как будем управлять множеством заметок
+    QMap<QString, Note*> m_openNotes; // Карта открытых заметок (путь -> объект Note)
+    QMap<QString, int> m_noteTabIndices; // Карта путей заметок к индексам вкладок
 
-    QTextEdit* titleText;
-    QTextEdit* textMain;
+    QString m_currentDirectory = "autosave"; // Текущая директория для отображения в списке
+    
+    void loadItemsFromDirectory(const QString &path); // Загружает заметки и папки из директории
+    void openNoteInTab(const QString &filePath); // Открывает заметку во вкладке
+    int getTabIndexForNote(const QString &filePath); // Получает индекс вкладки для заметки
 };

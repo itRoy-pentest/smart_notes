@@ -1,0 +1,17 @@
+# ninja log v6
+1	53	1748880095843798205	build.ninja	9abda37260d4068f
+165	195	1748876979334264872	CMakeFiles/smart_notes.dir/smart_notes_autogen/4UGIYD6VGQ/qrc_icon.cpp.o	bc73dc2cb729d8c9
+154	164	1748876979332454227	/home/roy/Documents/project/c++/smart_notes/smart_notes_autogen/4UGIYD6VGQ/qrc_icon.cpp	a9c50cfd55ffcc18
+137	1335	1748877471619267410	CMakeFiles/smart_notes.dir/src/mainwindow.cpp.o	be9cf646a6f38274
+1	7	1748878938136449465	/home/roy/Documents/project/c++/smart_notes/CMakeFiles/cmake.verify_globs	a5beb2575ea6a776
+137	1481	1748877471618815317	CMakeFiles/smart_notes.dir/smart_notes_autogen/mocs_compilation.cpp.o	8afe8f9ed6cc69df
+1	166	1748879292047576555	smart_notes_autogen/timestamp	a5a8076a6db741b5
+137	1040	1748877471619340058	CMakeFiles/smart_notes.dir/src/folder/folder.cpp.o	f566ca5c5cd37e6a
+137	1307	1748877471619163168	CMakeFiles/smart_notes.dir/src/main.cpp.o	d1a57663bd1c96b5
+1481	1691	1748877472961664791	smart_notes	831f03ea46c0fc6a
+1	166	1748879292047576555	smart_notes_autogen/mocs_compilation.cpp	a5a8076a6db741b5
+154	164	1748876979332454227	smart_notes_autogen/4UGIYD6VGQ/qrc_icon.cpp	a9c50cfd55ffcc18
+25	1124	1748877435455130073	CMakeFiles/smart_notes.dir/src/note/note.cpp.o	42475af4a2c41e90
+1	166	1748879292047576555	/home/roy/Documents/project/c++/smart_notes/smart_notes_autogen/mocs_compilation.cpp	a5a8076a6db741b5
+1	53	1748880095843493711	/home/roy/Documents/project/c++/smart_notes/cmake_install.cmake	9abda37260d4068f
+1	166	1748879292047576555	/home/roy/Documents/project/c++/smart_notes/smart_notes_autogen/timestamp	a5a8076a6db741b5

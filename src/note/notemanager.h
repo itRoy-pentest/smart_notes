@@ -4,6 +4,8 @@
 #include <QList>
 #include <QTextDocument>
 #include <memory>
+#include <vector>
+#include <cstddef> // Для size_t
 #include "note.h"
 
 class NoteManager : public QObject
@@ -20,7 +22,7 @@ public:
     const Note& note(int id) const;
     size_t count() const;
 
-    QTextDocument* noteDocument(int id) const;  // Оставляем const, т.к. он не меняет состояние объекта
+    QTextDocument* noteDocument(int id) const;
     std::vector<std::reference_wrapper<Note>> noteCollection();
 
 signals:
@@ -28,12 +30,11 @@ signals:
     void noteContentChanged(int id);
 
 public slots:
-    void onNoteContentChanged(int id);  // Этот слот должен быть неконстантным
+    void onNoteContentChanged(int id);
 
 private:
     QList<std::unique_ptr<Note>> notes;
     int nextNoteId();
 
-    QTextDocument* createTextDocumentForNote(const Note& note); // Убираем const
-    // Этот метод также будет неконстантным
+    QTextDocument* createTextDocumentForNote(const Note& note);
 };
