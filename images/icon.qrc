@@ -3,5 +3,6 @@
         <file>addFolder.png</file>
         <file>icons-trash-120.png</file>
         <file>addNote.png</file>
+        <file>changeSort.png</file>
     </qresource>
 </RCC>

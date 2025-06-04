@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listWidget, &QListWidget::customContextMenuRequested, this, &MainWindow::showContextMenu);
 
+    // НОВОЕ: Подключаем кнопку сортировки
+    connect(ui->changeSortButton, &QPushButton::clicked, this, &MainWindow::toggleSortOrder);
+
     // Убедимся, что корневая папка существует
     QDir rootDir("autosave");
     if (!rootDir.exists()) {
@@ -39,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
 
     m_currentDirectory = rootDir.absolutePath(); // Инициализируем m_currentDirectory абсолютным путем к autosave
+    m_currentSortOrder = QDir::Name | QDir::DirsFirst; // ИНИЦИАЛИЗАЦИЯ: Сортировка по имени, папки вначале
     loadItemsFromDirectory(m_currentDirectory); // Загружаем содержимое корневой директории
 }
 
@@ -53,12 +57,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadItemsFromDirectory(const QString &path)
 {
-    qDebug() << "Loading items from directory:" << path;
-    ui->listWidget->clear(); // Это вызовет "моргание" при полной перезагрузке
+    qDebug() << "Loading items from directory:" << path << "with sort order:" << m_currentSortOrder;
+    ui->listWidget->clear();
 
     QDir dir(path);
     dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-    dir.setSorting(QDir::Name | QDir::DirsFirst); // Сортируем папки первыми
+    dir.setSorting(m_currentSortOrder | QDir::DirsFirst); // Всегда держим папки вначале
 
     QDir autosaveRoot("autosave");
     if (dir.absolutePath() != autosaveRoot.absolutePath()) {
@@ -69,25 +73,25 @@ void MainWindow::loadItemsFromDirectory(const QString &path)
 
     QFileInfoList entries = dir.entryInfoList();
     for (const QFileInfo &entry : entries) {
-        if (entry.fileName().startsWith(".")) continue; // Игнорируем скрытые файлы/папки
+        if (entry.fileName().startsWith(".")) continue;
 
-        QListWidgetItem *item = new QListWidgetItem(); // Создаем элемент без текста, текст установим далее
+        QListWidgetItem *item = new QListWidgetItem();
         if (entry.isDir()) {
-            item->setText(entry.fileName()); // Для папок оставляем полное имя
-            item->setIcon(QIcon::fromTheme("folder")); // Иконка для папки
-            item->setData(Qt::UserRole, QVariant("folder")); // Тип: папка
+            item->setText(entry.fileName());
+            item->setIcon(QIcon(":/icon/addFolder.png")); // ИСПОЛЬЗУЕМ ВАШУ ИКОНКУ addFolder.png
+            item->setData(Qt::UserRole, QVariant("folder"));
         } else if (entry.isFile() && entry.suffix() == "md") {
-            item->setText(entry.baseName()); // Для заметок убираем расширение .md
-            item->setIcon(QIcon::fromTheme("text-x-markdown")); // Иконка для заметки
-            item->setData(Qt::UserRole, QVariant("note")); // Тип: заметка
-            item->setData(Qt::UserRole + 1, entry.absoluteFilePath()); // Путь к файлу
+            item->setText(entry.baseName());
+            item->setIcon(QIcon(":/icon/addNote.png"));   // ИСПОЛЬЗУЕМ ВАШУ ИКОНКУ addNote.png
+            item->setData(Qt::UserRole, QVariant("note"));
+            item->setData(Qt::UserRole + 1, entry.absoluteFilePath());
         } else {
-            delete item; // Игнорируем другие файлы
+            delete item;
             continue;
         }
         ui->listWidget->addItem(item);
     }
-    m_currentDirectory = path; // Обновляем текущую директорию
+    m_currentDirectory = path;
     qDebug() << "Current directory set to:" << m_currentDirectory;
 }
 
@@ -151,43 +155,35 @@ int MainWindow::getTabIndexForNote(const QString &filePath)
 
 void MainWindow::createNewNote()
 {
-    // Генерируем уникальное имя файла на основе временной метки, чтобы избежать перезаписи
     QString fileBasedTitle = "Untitled-" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
-    QString displayTitle = "Untitled"; // Это то, что пользователь увидит изначально
+    QString displayTitle = "Untitled";
 
-    QString noteFileName = fileBasedTitle + ".md"; // Имя файла на диске будет уникальным
+    QString noteFileName = fileBasedTitle + ".md";
     QString fullPath = QDir(m_currentDirectory).filePath(noteFileName);
 
     Note *newNote = new Note(this);
-    newNote->setInitialNoteContent(fullPath, displayTitle, ""); // Передаем отображаемое название
+    newNote->setInitialNoteContent(fullPath, displayTitle, "");
 
     connect(newNote, &Note::noteRenamed, this, &MainWindow::handleNoteRenamed);
     connect(newNote, &Note::noteClosed, this, &MainWindow::handleNoteClosed);
-    // Подключаем изменение содержимого заметки для обновления текста вкладки
     connect(newNote, &Note::noteContentChanged, this, [this, newNote]() {
-        // Чтобы найти индекс вкладки, нам нужно найти текущий путь заметки
-        // в m_openNotes, а затем получить его индекс из m_noteTabIndices.
         QString currentNotePath = newNote->getCurrentFilePath();
         int tabIndex = m_noteTabIndices.value(currentNotePath, -1);
-        
         if (tabIndex != -1) {
             ui->tabWidget->setTabText(tabIndex, newNote->getCurrentTitle());
         }
     });
 
-    // Добавляем вкладку с отображаемым названием "Untitled"
-    int tabIndex = ui->tabWidget->addTab(newNote->getNoteWidget(), displayTitle); 
+    int tabIndex = ui->tabWidget->addTab(newNote->getNoteWidget(), displayTitle);
     ui->tabWidget->setCurrentIndex(tabIndex);
 
-    // Сохраняем в картах, используя уникальный путь к файлу
     m_openNotes.insert(fullPath, newNote);
     m_noteTabIndices.insert(fullPath, tabIndex);
 
-    // Добавляем элемент в список с отображаемым названием "Untitled" и уникальным путем к файлу
-    QListWidgetItem *item = new QListWidgetItem(displayTitle); 
-    item->setIcon(QIcon::fromTheme("text-x-markdown"));
+    QListWidgetItem *item = new QListWidgetItem(displayTitle);
+    item->setIcon(QIcon(":/icon/addNote.png")); // ИСПОЛЬЗУЕМ ВАШУ ИКОНКУ addNote.png
     item->setData(Qt::UserRole, QVariant("note"));
-    item->setData(Qt::UserRole + 1, fullPath); // Храним уникальный путь к файлу в данных элемента
+    item->setData(Qt::UserRole + 1, fullPath);
     ui->listWidget->addItem(item);
 
     newNote->getTitleEdit()->setFocus();
@@ -276,10 +272,8 @@ void MainWindow::createNewDir()
     }
 
     if (newDir.mkpath(".")) {
-        // QMessageBox::information(this, "Успех", "Папка успешно создана!"); // ЭТА СТРОКА УДАЛЕНА ИЛИ ЗАКОММЕНТИРОВАНА
-        
         QListWidgetItem *item = new QListWidgetItem(dirName);
-        item->setIcon(QIcon::fromTheme("folder"));
+        item->setIcon(QIcon(":/icon/addFolder.png")); // ИСПОЛЬЗУЕМ ВАШУ ИКОНКУ addFolder.png
         item->setData(Qt::UserRole, QVariant("folder"));
         ui->listWidget->addItem(item);
         
@@ -515,15 +509,6 @@ void MainWindow::deleteItemFromContextMenu()
         return;
     }
 
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Подтверждение удаления",
-                                  "Вы уверены, что хотите удалить '" + itemName + "'? Это действие нельзя отменить.",
-                                  QMessageBox::Yes | QMessageBox::No);
-
-    if (reply == QMessageBox::No) {
-        return; // Пользователь отменил удаление
-    }
-
     if (type == "note") {
         QFile file(fullPath);
         if (file.remove()) {
@@ -559,5 +544,27 @@ void MainWindow::deleteItemFromContextMenu()
             QMessageBox::critical(this, "Ошибка", "Не удалось удалить папку рекурсивно. Проверьте права доступа.");
         }
     }
+}
+
+// НОВЫЙ СЛОТ: Переключение порядка сортировки
+void MainWindow::toggleSortOrder()
+{
+    // Цикличное переключение между порядками сортировки
+    if (m_currentSortOrder == (QDir::Name | QDir::DirsFirst)) {
+        m_currentSortOrder = QDir::Name | QDir::Reversed | QDir::DirsFirst; // Имя Z-A
+        qDebug() << "Sorting by Name Z-A";
+    } else if (m_currentSortOrder == (QDir::Name | QDir::Reversed | QDir::DirsFirst)) {
+        m_currentSortOrder = QDir::Time | QDir::Reversed | QDir::DirsFirst; // Дата изменения (новые сверху)
+        qDebug() << "Sorting by Date (Newest First)";
+    } else if (m_currentSortOrder == (QDir::Time | QDir::Reversed | QDir::DirsFirst)) {
+        m_currentSortOrder = QDir::Time | QDir::DirsFirst; // Дата изменения (старые сверху)
+        qDebug() << "Sorting by Date (Oldest First)";
+    }
+    else if (m_currentSortOrder == (QDir::Time | QDir::DirsFirst)) {
+        m_currentSortOrder = QDir::Name | QDir::DirsFirst; // Имя A-Z (по умолчанию)
+        qDebug() << "Sorting by Name A-Z";
+    }
+    
+    loadItemsFromDirectory(m_currentDirectory); // Перезагружаем список с новым порядком
 }
 

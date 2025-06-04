@@ -7,6 +7,7 @@
 #include <QMap>       // Для хранения открытых заметок по их пути
 #include <QListWidgetItem> // Для работы с элементами списка
 #include <QKeyEvent>    // Для обработки событий нажатия клавиш
+#include <QDir> // Добавлено для QDir::SortFlags
 
 // Макросы QT_BEGIN_NAMESPACE и QT_END_NAMESPACE
 // Оборачивают пространство имен Qt, чтобы оно не вступало в конфликт с вашим кодом
@@ -44,6 +45,7 @@ private slots:
     void showContextMenu(const QPoint &pos); // НОВОЕ: Слот для отображения контекстного меню
     void renameSelectedItem();               // НОВОЕ: Слот для переименования из контекстного меню
     void deleteItemFromContextMenu();        // НОВОЕ: Слот для удаления из контекстного меню
+    void toggleSortOrder(); // НОВЫЙ СЛОТ ДЛЯ СОРТИРОВКИ
 
 signals:
 
@@ -55,6 +57,7 @@ private:
     QMap<QString, int> m_noteTabIndices; // Карта путей заметок к индексам вкладок
 
     QString m_currentDirectory = "autosave"; // Текущая директория для отображения в списке
+    QDir::SortFlags m_currentSortOrder; // НОВОЕ: Переменная для хранения текущего порядка сортировки
     
     void loadItemsFromDirectory(const QString &path); // Загружает заметки и папки из директории
     void openNoteInTab(const QString &filePath); // Открывает заметку во вкладке
