@@ -20,6 +20,32 @@ Note::Note(QWidget *parent) : QWidget(parent), ui(new Ui::Note)
     titleText = ui->titleText;
     textMain = ui->textEdit;
 
+    // Настройка форматирования заголовка
+    QTextOption titleOption;
+    titleOption.setAlignment(Qt::AlignCenter);
+    titleText->document()->setDefaultTextOption(titleOption);
+    titleText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    titleText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    titleText->setFixedHeight(80); // Фиксированная высота для заголовка
+    titleText->setLineWrapMode(QTextEdit::WidgetWidth);
+    titleText->setWordWrapMode(QTextOption::WrapAnywhere);
+
+    // Настройка форматирования основного текста
+    QTextOption textOption;
+    textOption.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    textMain->document()->setDefaultTextOption(textOption);
+    textMain->setLineWrapMode(QTextEdit::WidgetWidth);
+    textMain->setWordWrapMode(QTextOption::WrapAnywhere);
+    textMain->setAcceptRichText(false); // Отключаем форматированный текст
+    
+    // Устанавливаем отступы для текста
+    QTextCursor cursor = textMain->textCursor();
+    QTextBlockFormat blockFormat = cursor.blockFormat();
+    blockFormat.setIndent(1);
+    blockFormat.setTextIndent(0);
+    cursor.setBlockFormat(blockFormat);
+    textMain->setTextCursor(cursor);
+
     m_currentFilePath = ""; // Изначально нет пути к файлу
     m_initialTitle = "";    // Нет начального заголовка
 
@@ -59,6 +85,26 @@ void Note::setNoteData(const QString &filePath)
         
         QFileInfo fileInfo(filePath);
         QString title = fileInfo.baseName();
+        if (title.trimmed().isEmpty() || title.startsWith("Untitled")) {
+            QDir dir = fileInfo.dir();
+            QString base = "Untitled";
+            QString newTitle = base;
+            int idx = 0;
+            while (true) {
+                bool exists = false;
+                QString checkName = (idx == 0) ? base : base + " " + QString::number(idx);
+                QString checkPath = dir.filePath(checkName + ".md");
+                if (QFileInfo::exists(checkPath) && checkPath != filePath) {
+                    exists = true;
+                }
+                if (!exists) {
+                    newTitle = checkName;
+                    break;
+                }
+                ++idx;
+            }
+            title = newTitle;
+        }
         ui->titleText->setText(title);
         m_initialTitle = title; // Устанавливаем начальный заголовок из имени файла
         qDebug() << "Note loaded from" << filePath;
@@ -113,6 +159,45 @@ void Note::onTitleTextChanged()
 {
     // Помечаем документ как измененный
     ui->titleText->document()->setModified(true);
+    QString currentTitle = ui->titleText->toPlainText().trimmed();
+    if (currentTitle.isEmpty()) {
+        // Подбор уникального имени
+        QFileInfo fileInfo(m_currentFilePath);
+        QDir dir = fileInfo.dir();
+        QString base = "Untitled";
+        QString newTitle = base;
+        int idx = 0;
+        while (true) {
+            bool exists = false;
+            QString checkName = (idx == 0) ? base : base + " " + QString::number(idx);
+            QString checkPath = dir.filePath(checkName + ".md");
+            if (QFileInfo::exists(checkPath) && checkPath != m_currentFilePath) {
+                exists = true;
+            }
+            if (!exists) {
+                newTitle = checkName;
+                break;
+            }
+            ++idx;
+        }
+        // Устанавливаем уникальное имя
+        ui->titleText->blockSignals(true);
+        ui->titleText->setText(newTitle);
+        ui->titleText->blockSignals(false);
+        m_initialTitle = newTitle;
+        // --- Новый блок: переименование файла, если имя файла не совпадает с новым заголовком ---
+        QString oldFileName = QFileInfo(m_currentFilePath).baseName();
+        if (oldFileName != newTitle) {
+            QString oldPath = m_currentFilePath;
+            QString newPath = dir.filePath(newTitle + ".md");
+            QFile oldFile(oldPath);
+            if (oldFile.rename(newPath)) {
+                m_currentFilePath = newPath;
+                m_initialTitle = newTitle;
+                emit noteRenamed(oldPath, newPath);
+            }
+        }
+    }
     autoNoteSave(); // Запускаем логику сохранения, включая проверку переименования
     emit noteContentChanged(m_currentFilePath);
 }

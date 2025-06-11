@@ -24,10 +24,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->addFolder, &QPushButton::clicked, this, &MainWindow::createNewDir);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabWidget_tabCloseRequested);
     connect(ui->listWidget, &QListWidget::itemClicked, this, &MainWindow::onListItemClicked);
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::on_tabWidget_currentChanged); // Подключаем новый слот
-    // Теперь deleteItem (если кнопка есть в UI) не будет подключена напрямую,
-    // удаление будет через контекстное меню или клавишу Delete.
-
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::on_tabWidget_currentChanged);
+    
     // НОВОЕ: Включаем контекстное меню для QListWidget
     ui->listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->listWidget, &QListWidget::customContextMenuRequested, this, &MainWindow::showContextMenu);
@@ -44,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_currentDirectory = rootDir.absolutePath(); // Инициализируем m_currentDirectory абсолютным путем к autosave
     m_currentSortOrder = QDir::Name | QDir::DirsFirst; // ИНИЦИАЛИЗАЦИЯ: Сортировка по имени, папки вначале
     loadItemsFromDirectory(m_currentDirectory); // Загружаем содержимое корневой директории
+
+    // Устанавливаем начальный фокус на список
+    ui->listWidget->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -93,12 +94,18 @@ void MainWindow::loadItemsFromDirectory(const QString &path)
     }
     m_currentDirectory = path;
     qDebug() << "Current directory set to:" << m_currentDirectory;
+
+    // Устанавливаем фокус на список после загрузки элементов
+    ui->listWidget->setFocus();
 }
 
 void MainWindow::onListItemClicked(QListWidgetItem *item)
 {
     QString type = item->data(Qt::UserRole).toString();
     QString itemName = item->text();
+
+    // Устанавливаем фокус на список при клике
+    ui->listWidget->setFocus();
 
     if (type == "folder") {
         QString newPath = QDir(m_currentDirectory).filePath(itemName);
@@ -135,7 +142,16 @@ void MainWindow::openNoteInTab(const QString &filePath)
     connect(note, &Note::noteContentChanged, this, [this, note, filePath]() {
         int tabIndex = m_noteTabIndices.value(filePath, -1); // Используем исходный путь для поиска вкладки
         if (tabIndex != -1) {
-            ui->tabWidget->setTabText(tabIndex, note->getCurrentTitle());
+            QString title = note->getCurrentTitle();
+            ui->tabWidget->setTabText(tabIndex, title.isEmpty() ? "" : title);
+            // Обновляем название в списке слева
+            for (int i = 0; i < ui->listWidget->count(); ++i) {
+                QListWidgetItem *item = ui->listWidget->item(i);
+                if (item->data(Qt::UserRole).toString() == "note" && item->data(Qt::UserRole + 1).toString() == filePath) {
+                    item->setText(title.isEmpty() ? "" : title);
+                    break;
+                }
+            }
         }
     });
 
@@ -155,11 +171,32 @@ int MainWindow::getTabIndexForNote(const QString &filePath)
 
 void MainWindow::createNewNote()
 {
-    QString fileBasedTitle = "Untitled-" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
-    QString displayTitle = "Untitled";
-
+    // Подбор уникального имени
+    QDir dir(m_currentDirectory);
+    QString base = "Untitled";
+    QString displayTitle = base;
+    int idx = 0;
+    while (true) {
+        bool exists = false;
+        QString checkName = (idx == 0) ? base : base + " " + QString::number(idx);
+        QString checkPath = dir.filePath(checkName + ".md");
+        for (int i = 0; i < ui->listWidget->count(); ++i) {
+            QListWidgetItem *item = ui->listWidget->item(i);
+            if (item->data(Qt::UserRole).toString() == "note" && item->text() == checkName) {
+                exists = true;
+                break;
+            }
+        }
+        if (QFileInfo::exists(checkPath) || exists) {
+            ++idx;
+            continue;
+        }
+        displayTitle = checkName;
+        break;
+    }
+    QString fileBasedTitle = displayTitle;
     QString noteFileName = fileBasedTitle + ".md";
-    QString fullPath = QDir(m_currentDirectory).filePath(noteFileName);
+    QString fullPath = dir.filePath(noteFileName);
 
     Note *newNote = new Note(this);
     newNote->setInitialNoteContent(fullPath, displayTitle, "");
@@ -170,7 +207,16 @@ void MainWindow::createNewNote()
         QString currentNotePath = newNote->getCurrentFilePath();
         int tabIndex = m_noteTabIndices.value(currentNotePath, -1);
         if (tabIndex != -1) {
-            ui->tabWidget->setTabText(tabIndex, newNote->getCurrentTitle());
+            QString title = newNote->getCurrentTitle();
+            ui->tabWidget->setTabText(tabIndex, title.isEmpty() ? "" : title);
+            // Обновляем название в списке слева
+            for (int i = 0; i < ui->listWidget->count(); ++i) {
+                QListWidgetItem *item = ui->listWidget->item(i);
+                if (item->data(Qt::UserRole).toString() == "note" && item->data(Qt::UserRole + 1).toString() == currentNotePath) {
+                    item->setText(title.isEmpty() ? "" : title);
+                    break;
+                }
+            }
         }
     });
 
@@ -324,15 +370,6 @@ void MainWindow::deleteSelectedItems()
         return;
     }
 
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Подтверждение удаления",
-                                  "Вы уверены, что хотите удалить \"" + itemName + "\"? Это действие нельзя отменить.",
-                                  QMessageBox::Yes | QMessageBox::No);
-
-    if (reply == QMessageBox::No) {
-        return; // Пользователь отменил удаление
-    }
-
     if (type == "note") {
         QFile file(fullPath);
         if (file.remove()) {
@@ -346,7 +383,6 @@ void MainWindow::deleteSelectedItems()
             }
             // Удаляем элемент из QListWidget
             delete ui->listWidget->takeItem(ui->listWidget->row(selectedItem));
-            // QMessageBox::information(this, "Удаление", "Заметка успешно удалена."); // Можно оставить, если нужно подтверждение
         } else {
             QMessageBox::critical(this, "Ошибка", "Не удалось удалить заметку. Ошибка: " + file.errorString());
         }
@@ -385,186 +421,30 @@ void MainWindow::deleteSelectedItems()
 
             // Удаляем элемент из QListWidget
             delete ui->listWidget->takeItem(ui->listWidget->row(selectedItem));
-            // QMessageBox::information(this, "Удаление", "Папка и ее содержимое успешно удалены."); // Можно оставить
-            loadItemsFromDirectory(m_currentDirectory); // Перезагружаем список, чтобы убедиться, что все корректно обновлено
         } else {
             QMessageBox::critical(this, "Ошибка", "Не удалось удалить папку рекурсивно. Проверьте права доступа.");
         }
     }
 }
 
-// НОВОЕ: Переопределение keyPressEvent для обработки клавиши Delete
+// Переопределение keyPressEvent для обработки клавиши Delete
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Delete) {
-        deleteSelectedItems(); // Вызываем слот для удаления
+        qDebug() << "Delete key pressed. List widget has focus:" << ui->listWidget->hasFocus();
+        // Проверяем, находится ли фокус на listWidget
+        if (ui->listWidget->hasFocus()) {
+            deleteSelectedItems(); // Вызываем слот для удаления
+        } else {
+            QMainWindow::keyPressEvent(event); // Передаем событие базовому классу для других виджетов
+        }
     } else {
         QMainWindow::keyPressEvent(event); // Передаем событие базовому классу для других клавиш
     }
 }
 
-// НОВОЕ: Слот для отображения контекстного меню
-void MainWindow::showContextMenu(const QPoint &pos)
-{
-    QListWidgetItem *item = ui->listWidget->itemAt(pos);
-    if (item) { // Показываем меню только если кликнули по элементу
-        QMenu contextMenu(tr("Context menu"), this);
-
-        QAction actionRename(tr("Переименовать"), this);
-        QAction actionDelete(tr("Удалить"), this);
-
-        connect(&actionRename, &QAction::triggered, this, &MainWindow::renameSelectedItem);
-        connect(&actionDelete, &QAction::triggered, this, &MainWindow::deleteItemFromContextMenu);
-
-        contextMenu.addAction(&actionRename);
-        contextMenu.addAction(&actionDelete);
-
-        contextMenu.exec(ui->listWidget->mapToGlobal(pos)); // Показываем меню в позиции курсора
-    }
-}
-
-// НОВОЕ: Слот для переименования элемента
-void MainWindow::renameSelectedItem()
-{
-    QListWidgetItem *selectedItem = ui->listWidget->currentItem();
-    if (!selectedItem || selectedItem->data(Qt::UserRole).toString() == "..") {
-        QMessageBox::information(this, "Переименование", "Пожалуйста, выберите заметку или папку для переименования.");
-        return;
-    }
-
-    QString type = selectedItem->data(Qt::UserRole).toString();
-    QString oldDisplayName = selectedItem->text(); // Текущее отображаемое имя (базовое имя)
-    QString oldFullPath;
-
-    if (type == "note") {
-        oldFullPath = selectedItem->data(Qt::UserRole + 1).toString();
-        oldDisplayName = QFileInfo(oldFullPath).baseName(); // Берем базовое имя для диалога
-    } else if (type == "folder") {
-        oldFullPath = QDir(m_currentDirectory).filePath(oldDisplayName); // Полный путь к старой папке
-    } else {
-        return;
-    }
-
-    bool ok;
-    QString newName = QInputDialog::getText(this, tr("Переименовать"),
-                                            tr("Введите новое имя для '%1':").arg(oldDisplayName),
-                                            QLineEdit::Normal,
-                                            oldDisplayName, &ok);
-
-    if (ok && !newName.isEmpty() && newName != oldDisplayName) {
-        bool success = false;
-
-        if (type == "note") {
-            QString newFullPath = QFileInfo(oldFullPath).dir().filePath(newName + ".md");
-            QFile oldFile(oldFullPath);
-            success = oldFile.rename(newFullPath);
-            if (success) {
-                handleNoteRenamed(oldFullPath, newFullPath);
-            } else {
-                QMessageBox::critical(this, "Ошибка переименования", "Не удалось переименовать заметку. Ошибка: " + oldFile.errorString());
-            }
-        } else if (type == "folder") {
-            // ИЗМЕНЕНИЕ ЗДЕСЬ:
-            // 1. Создаем объект QDir, представляющий родительскую директорию.
-            //    В данном случае m_currentDirectory - это и есть родительская директория.
-            QDir parentDir(m_currentDirectory); 
-            
-            // 2. Вызываем метод rename() на этом объекте, передавая старое базовое имя
-            //    и новое базовое имя.
-            success = parentDir.rename(oldDisplayName, newName); 
-
-            if (success) {
-                // Обновляем отображаемое имя в списке
-                selectedItem->setText(newName); 
-                // Перезагружаем список, чтобы убедиться, что все пути и порядок корректны.
-                // Это также обновит m_currentDirectory, если это было переименование
-                // текущей директории, что крайне редко, но важно для консистентности.
-                loadItemsFromDirectory(m_currentDirectory); 
-            } else {
-                QMessageBox::critical(this, "Ошибка переименования", "Не удалось переименовать папку. Проверьте права доступа.");
-            }
-        }
-    } else if (ok && newName.isEmpty()) {
-        QMessageBox::warning(this, "Переименование", "Имя не может быть пустым.");
-    }
-}
-
-// НОВОЕ: Слот для удаления элемента из контекстного меню или клавиши Delete
-void MainWindow::deleteItemFromContextMenu()
-{
-    QListWidgetItem *selectedItem = ui->listWidget->currentItem();
-    if (!selectedItem || selectedItem->data(Qt::UserRole).toString() == "..") {
-        return; // Ничего не выбрано или выбран ".."
-    }
-
-    QString type = selectedItem->data(Qt::UserRole).toString();
-    QString itemName = selectedItem->text();
-    QString fullPath;
-
-    if (type == "note") {
-        fullPath = selectedItem->data(Qt::UserRole + 1).toString();
-    } else if (type == "folder") {
-        fullPath = QDir(m_currentDirectory).filePath(itemName);
-    } else {
-        return;
-    }
-
-    if (type == "note") {
-        QFile file(fullPath);
-        if (file.remove()) {
-            if (m_openNotes.contains(fullPath)) {
-                int tabIndex = m_noteTabIndices.value(fullPath, -1);
-                if (tabIndex != -1) {
-                    on_tabWidget_tabCloseRequested(tabIndex);
-                }
-            }
-            delete ui->listWidget->takeItem(ui->listWidget->row(selectedItem));
-        } else {
-            QMessageBox::critical(this, "Ошибка", "Не удалось удалить заметку. Ошибка: " + file.errorString());
-        }
-    } else if (type == "folder") {
-        QDir dir(fullPath);
-        
-        if (dir.removeRecursively()) {
-            QList<QString> notesToClose;
-            for(const QString& notePath : m_openNotes.keys()) {
-                if (notePath.startsWith(fullPath)) {
-                    notesToClose.append(notePath);
-                }
-            }
-            for(const QString& notePath : notesToClose) {
-                int tabIndex = m_noteTabIndices.value(notePath, -1);
-                if (tabIndex != -1) {
-                    on_tabWidget_tabCloseRequested(tabIndex);
-                }
-            }
-            delete ui->listWidget->takeItem(ui->listWidget->row(selectedItem));
-            loadItemsFromDirectory(m_currentDirectory);
-        } else {
-            QMessageBox::critical(this, "Ошибка", "Не удалось удалить папку рекурсивно. Проверьте права доступа.");
-        }
-    }
-}
-
-// НОВЫЙ СЛОТ: Переключение порядка сортировки
-void MainWindow::toggleSortOrder()
-{
-    // Цикличное переключение между порядками сортировки
-    if (m_currentSortOrder == (QDir::Name | QDir::DirsFirst)) {
-        m_currentSortOrder = QDir::Name | QDir::Reversed | QDir::DirsFirst; // Имя Z-A
-        qDebug() << "Sorting by Name Z-A";
-    } else if (m_currentSortOrder == (QDir::Name | QDir::Reversed | QDir::DirsFirst)) {
-        m_currentSortOrder = QDir::Time | QDir::Reversed | QDir::DirsFirst; // Дата изменения (новые сверху)
-        qDebug() << "Sorting by Date (Newest First)";
-    } else if (m_currentSortOrder == (QDir::Time | QDir::Reversed | QDir::DirsFirst)) {
-        m_currentSortOrder = QDir::Time | QDir::DirsFirst; // Дата изменения (старые сверху)
-        qDebug() << "Sorting by Date (Oldest First)";
-    }
-    else if (m_currentSortOrder == (QDir::Time | QDir::DirsFirst)) {
-        m_currentSortOrder = QDir::Name | QDir::DirsFirst; // Имя A-Z (по умолчанию)
-        qDebug() << "Sorting by Name A-Z";
-    }
-    
-    loadItemsFromDirectory(m_currentDirectory); // Перезагружаем список с новым порядком
-}
+void MainWindow::showContextMenu(const QPoint &) {}
+void MainWindow::renameSelectedItem() {}
+void MainWindow::deleteItemFromContextMenu() {}
+void MainWindow::toggleSortOrder() {}
 

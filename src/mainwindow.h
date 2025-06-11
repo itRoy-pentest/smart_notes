@@ -18,6 +18,28 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
+// Новый класс для списка заметок с обработкой клавиши Delete
+class NoteListWidget : public QListWidget
+{
+    Q_OBJECT
+public:
+    explicit NoteListWidget(QWidget *parent = nullptr) : QListWidget(parent) {}
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override
+    {
+        if (event->key() == Qt::Key_Delete) {
+            emit deleteKeyPressed();
+            event->accept();
+        } else {
+            QListWidget::keyPressEvent(event);
+        }
+    }
+
+signals:
+    void deleteKeyPressed();
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -28,9 +50,6 @@ public:
 
     void updateNoteTabTitle();
     void updateNoteTitle();
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override; // НОВОЕ: Переопределение для обработки клавиш
 
 private slots:
     void createNewNote();
@@ -43,12 +62,14 @@ private slots:
     void deleteSelectedItems(); // Этот слот теперь будет вызываться из keyPressEvent
 
     void showContextMenu(const QPoint &pos); // НОВОЕ: Слот для отображения контекстного меню
-    void renameSelectedItem();               // НОВОЕ: Слот для переименования из контекстного меню
+    void renameSelectedItem();
     void deleteItemFromContextMenu();        // НОВОЕ: Слот для удаления из контекстного меню
     void toggleSortOrder(); // НОВЫЙ СЛОТ ДЛЯ СОРТИРОВКИ
 
 signals:
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
